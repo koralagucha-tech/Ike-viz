@@ -1,0 +1,31 @@
+name: Build plugin
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        run: rustup toolchain install stable --profile minimal
+
+      - name: Install cargo-skyline
+        run: cargo install cargo-skyline --locked
+
+      - name: Download the Skyline toolchain
+        run: cargo skyline update-std
+
+      - name: Build the plugin
+        run: cargo skyline build --release
+
+      - name: Upload the .nro
+        uses: actions/upload-artifact@v4
+        with:
+          name: ike_taunt
+          path: target/aarch64-skyline-switch/release/*.nro
+          if-no-files-found: error
